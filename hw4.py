@@ -69,7 +69,10 @@ def percent(data:list[build_data.CountyDemographics], field:str, level:str) -> l
     total = 0
     for county in data:
         total += county.population['2014 Population']
-    percent = fil_pop * total*0.01
+    if total == 0:
+        percent = 0.0
+    else:
+        percent = fil_pop / total
     print(f"2014 {field}.{level}: {percent}")
     return data
 
@@ -98,71 +101,69 @@ def main():
         sys.exit(1)
 
     operations_file = sys.argv[1]
-    #op1 = "inputs/bachelors_gt_60.ops"
-    #op2 = "inputs/ca.ops"
-    #op3 = "inputs/filter_state.ops"
-    #op4 = "inputs/high_school_lt_60.ops"
-    #op5 = "inputs/percent_fields.ops"
-    #op6 = "inputs/pop.ops"
-    #op7 = "inputs/pop_field.ops"
-    #op8 = "inputs/some_errors.ops"
-    #op9 = "inputs/task2_a.ops"
-    #op10= "inputs/task2_b.ops"
-    #op11 = "inputs/task2_c.ops"
-    #op12 = "inputs/task2_d.ops"
-    #operations_file = [op1, op2, op3, op4, op5, op6, op7, op8, op9, op10, op11, op12]
+    #operations_file = "inputs/bachelors_gt_60.ops"
+    #operations_file = "inputs/ca.ops"
+    #operations_file = "inputs/filter_state.ops"
+    #operations_file = "inputs/high_school_lt_60.ops"
+    #operations_file = "inputs/percent_fields.ops"
+    #operations_file = "inputs/pop.ops"
+    #operations_file = "inputs/pop_field.ops"
+    #operations_file = "inputs/some_errors.ops"
+    #operations_file = "inputs/task2_a.ops"
+    #operations_file = "inputs/task2_b.ops"
+    #operations_file = "inputs/task2_c.ops"
+    #operations_file = "inputs/task2_d.ops"
 
     # Load the dataset
-    for op in operations_file:
-        data = get_data()
-        # Try the operation file
-        try:
-            with open(op, "r")as file:
-                print(len(data), "records loaded")
-                for line in file:
-                    line = line.strip()
-                    if not line:  # Skip blank lines
-                        continue
-                    parts = line.split(":")
-                    operation = parts[0]
+    data = get_data()
+    # Try the operation file
+    try:
+        with open(operations_file, "r")as file:
+            print(len(data), "records loaded")
+            for line in file:
+                line = line.strip()
+                if not line:  # Skip blank lines
+                    continue
+                parts = line.split(":")
+                operation = parts[0]
 
-                    # Handle operations
-                    if operation == "filter-gt":
-                        specifc = parts[1].split(".")
-                        field = specifc[0]
-                        value = float(parts[2])
-                        level = specifc[1]
-                        data = filter_gt(data, field.lower(), level, value)
-                    elif operation == "filter-lt":
-                        specifc = parts[1].split(".")
-                        field = specifc[0]
-                        value = float(parts[2])
-                        level = specifc[1]
-                        data = filter_lt(data, field.lower(), level, value)
-                    elif operation == "filter-state":
-                        state_abbr = parts[1]
-                        data = filter_state(data, state_abbr)
-                    elif operation == "population-total":
-                        data = population_total(data)
-                    #elif operation == "population":
-                    elif operation == "population":
-                        specifc = parts[1].split(".")
-                        field = specifc[0]
-                        level = specifc[1]
-                        data = population(data, field.lower(), level)
-                    elif operation == "percent":
-                        specifc = parts[1].split(".")
-                        field = specifc[0]
-                        level = specifc[1]
-                        data = percent(data, field.lower(), level)
-                    elif operation == "display":
-                        display(data)
-                    else:
-                        print(f"Error: Unsupported operation '{operation}'")
-        except FileNotFoundError:
-            print(f"Error: Cannot open file '{operations_file}'")
-        except Exception as e:
-            print(f"Error processing operations file: {e}")
+                # Handle operations
+                if operation == "filter-gt":
+                    specifc = parts[1].split(".")
+                    field = specifc[0]
+                    value = float(parts[2])
+                    level = specifc[1]
+                    data = filter_gt(data, field.lower(), level, value)
+                elif operation == "filter-lt":
+                    specifc = parts[1].split(".")
+                    field = specifc[0]
+                    value = float(parts[2])
+                    level = specifc[1]
+                    data = filter_lt(data, field.lower(), level, value)
+                elif operation == "filter-state":
+                    state_abbr = parts[1]
+                    data = filter_state(data, state_abbr)
+                elif operation == "population-total":
+                    data = population_total(data)
+                #elif operation == "population":
+                elif operation == "population":
+                    specifc = parts[1].split(".")
+                    field = specifc[0]
+                    level = specifc[1]
+                    data = population(data, field.lower(), level)
+                elif operation == "percent":
+                    specifc = parts[1].split(".")
+                    field = specifc[0]
+                    level = specifc[1]
+                    data = percent(data, field.lower(), level)
+                elif operation == "display":
+                    display(data)
+                else:
+                    print(f"Error: Unsupported operation '{operation}'")
+    except FileNotFoundError:
+        print(f"Error: Cannot open file '{operations_file}'")
+    except Exception as e:
+        print(f"Error processing operations file: {e}")
 
 if __name__ == "__main__":
     main()
